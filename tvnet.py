@@ -20,7 +20,7 @@ class TVNet(object):
         return tf.floor(grey_x)
 
     def normalize_images(self, x1, x2):
-        reduction_axes = [i for i in xrange(1, len(x1.shape))]
+        reduction_axes = [i for i in range(1, len(x1.shape))]
         min_x1 = tf.reduce_min(x1, axis=reduction_axes)
         max_x1 = tf.reduce_max(x1, axis=reduction_axes)
 
@@ -32,7 +32,7 @@ class TVNet(object):
 
         den = max_val - min_val
 
-        expand_dims = [-1 if i == 0 else 1 for i in xrange(len(x1.shape))]
+        expand_dims = [-1 if i == 0 else 1 for i in range(len(x1.shape))]
         min_val_ex = tf.reshape(min_val, expand_dims)
         den_ex = tf.reshape(den, expand_dims)
 
@@ -181,7 +181,7 @@ class TVNet(object):
 
         p11 = p12 = p21 = p22 = tf.zeros_like(x1)
 
-        for warpings in xrange(warps):
+        for warpings in range(warps):
             with tf.variable_scope('warping%d' % (warpings,)):
                 u1_flat = tf.reshape(u1, (tf.shape(x2)[0], 1, x2.shape[1].value * x2.shape[2].value))
                 u2_flat = tf.reshape(u2, (tf.shape(x2)[0], 1, x2.shape[1].value * x2.shape[2].value))
@@ -202,7 +202,7 @@ class TVNet(object):
 
                 rho_c = x2_warp - diff2_x_warp * u1 - diff2_y_warp * u2 - x1
 
-                for ii in xrange(max_iterations):
+                for ii in range(max_iterations):
                     with tf.variable_scope('iter%d' % (ii,)):
                         rho = rho_c + diff2_x_warp * u1 + diff2_y_warp * u2 + self.GRAD_IS_ZERO;
 
@@ -248,7 +248,7 @@ class TVNet(object):
                     max_iterations=5  # maximum number of iterations for optimization
                     ):
 
-        for i in xrange(len(x1.shape)):
+        for i in range(len(x1.shape)):
             assert x1.shape[i].value == x2.shape[i].value
 
         zfactor = np.float32(zfactor)
@@ -266,16 +266,16 @@ class TVNet(object):
 
             smooth_x1 = self.gaussian_smooth(norm_imgs[0])
             smooth_x2 = self.gaussian_smooth(norm_imgs[1])
-            for ss in xrange(n_scales - 1, -1, -1):
+            for ss in range(n_scales - 1, -1, -1):
                 with tf.variable_scope('scale%d' % ss):
                     down_sample_factor = zfactor ** ss
                     down_height, down_width = self.zoom_size(height, width, down_sample_factor)
 
                     if ss == n_scales - 1:
                         u1 = tf.get_variable('u1', shape=[1, down_height, down_width, 1], dtype=tf.float32,
-                                             initializer=tf.zeros_initializer)
+                                             initializer=tf.zeros_initializer())
                         u2 = tf.get_variable('u2', shape=[1, down_height, down_width, 1], dtype=tf.float32,
-                                             initializer=tf.zeros_initializer)
+                                             initializer=tf.zeros_initializer())
                         u1 = tf.tile(u1, [tf.shape(smooth_x1)[0], 1, 1, 1])
                         u2 = tf.tile(u2, [tf.shape(smooth_x1)[0], 1, 1, 1])
 
